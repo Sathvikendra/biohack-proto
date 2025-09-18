@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { supabase } from "@/lib/supabaseClient"; // adjust path if different
 import Layout from "@/components/Layout";
 
+
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");

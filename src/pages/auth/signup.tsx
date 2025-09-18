@@ -1,7 +1,7 @@
 // src/pages/auth/signup.tsx
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "@/lib/supabaseClient"; // adjust path if different
+import { supabase } from "../../lib/supabaseClient"; // adjust path if different
 import Layout from "@/components/Layout";
 
 export default function SignUp() {

@@ -1,4 +1,5 @@
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from '../context/AuthContext';
+
 
 export default function DashboardHeader() {
   const { user, signOut, loading } = useAuth();
