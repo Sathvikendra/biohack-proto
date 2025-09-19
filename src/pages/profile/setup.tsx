@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "@/components/Layout";
@@ -23,6 +24,24 @@ const steps = [
 export default function ProfileSetup() {
   const { user } = useAuth();
   const router = useRouter();
+  useEffect(() => {
+    if (!user) return;
+
+    const checkProfile = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (data) {
+        // User already has a profile → redirect to dashboard
+        router.replace("/dashboard");
+      }
+    };
+
+    checkProfile();
+  }, [user, router]);
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
@@ -83,10 +102,11 @@ export default function ProfileSetup() {
     setMsg("");
 
     let labPath = form.recent_lab_file;
+    if(!labFile) return;
     if (labFile) {
       const { data, error: uploadErr } = await supabase.storage
-        .from("lab-tests")
-        .upload(`${user.id}/${labFile.name}`, labFile, { upsert: true });
+        .from('lab-tests')
+        .upload(`${user.id}/${labFile.name}`, labFile, { upsert: true ,contentType: 'application/pdf'});
       if (uploadErr) {
         setMsg(uploadErr.message);
         setLoading(false);
@@ -112,7 +132,7 @@ export default function ProfileSetup() {
 
     setLoading(false);
     if (error) setMsg(error.message);
-    else router.push("/dashboard");
+    else router.push("/dashboard/index");
   };
 
   const renderStep = () => {
@@ -156,7 +176,7 @@ export default function ProfileSetup() {
             <div className="mb-4">
               <label className="block mb-1 font-medium">Avg Meals per day</label>
               <select name="daily_meals" value={form.daily_meals} onChange={handleChange} className="w-full border p-2 rounded">
-                <option value="">Select</option><option>Once</option><option>Twice</option><option>Thrice</option>
+                <option value="">Select</option><option>1</option><option>2</option><option>3</option>
               </select>
             </div>
             <RadioGroup name="diet_type" label="Diet Type" options={["Vegetarian","Vegan","Non Vegetarian","Mixed"]} value={form.diet_type} onChange={handleChange}/>
@@ -267,29 +287,25 @@ export default function ProfileSetup() {
 
             <div className="mb-4">
                 <label className="block mb-2 font-medium">Upload Lab Test PDF</label>
-                <label className="flex items-center px-4 py-2 bg-gray-200 rounded cursor-pointer hover:bg-gray-300">
-                <span>{labFile ? labFile.name : "Choose file..."}</span>
-                <input
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center px-4 py-2 bg-gray-200 rounded cursor-pointer hover:bg-gray-300">
+                    <span>{labFile ? labFile.name : "Choose file..."}</span>
+                    <input
                     type="file"
                     accept="application/pdf"
-                    onChange={(e) => setLabFile(e.target.files?.[0] || null)}
+                    onChange={(e)=>setLabFile(e.target.files?.[0] || null)}
                     className="hidden"
-                />
-                </label>
+                    />
+                  </label>
+                  {labFile && (
+                    <button
+                    type="button"
+                    onClick={()=>setLabFile(null)}
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >Remove</button>
+                  )}
+                </div>
             </div>
-              {/* <textarea
-                key={field}
-                name={field}
-                placeholder={field.replace(/_/g," ")}
-                value={(form as any)[field]}
-                onChange={handleChange}
-                className="w-full border rounded p-2 mb-4"
-              />
-            ))}
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">Upload Lab Test PDF</label>
-              <input type="file" accept="application/pdf" onChange={(e) => setLabFile(e.target.files?.[0] || null)} />
-            </div> */}
           </>
         );
       case 7:

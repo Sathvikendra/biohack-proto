@@ -19,12 +19,12 @@ export default function Layout({
         />
       </Head>
 
-      <header className="flex justify-between items-center p-4 bg-gray-100">
+      <header className="sticky top-0 z-50 flex justify-between items-center px-6 py-3 bg-white shadow-md">
         <h1 className="text-xl font-bold">{title}</h1>
         <DashboardHeader />
       </header>
 
-      <main className="min-h-screen bg-gray-50 text-gray-800">
+      <main className="min-h-screen bg-gray-50 text-gray-800 p-6">
         {children}
       </main>
     </>
