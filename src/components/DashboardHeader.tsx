@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../context/AuthContext";
 
@@ -30,25 +31,37 @@ export default function DashboardHeader() {
   if (loading || loadingName) return <p>Loading...</p>;
 
   return (
-    <div className="flex items-center space-x-4">
-      {user ? (
-        <>
-          <span className="font-medium text-gray-700">Welcome back, {name || "User"}</span>
-          <button
-            onClick={signOut}
-            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+    <header className="flex items-center justify-between px-6 py-4 bg-white shadow">
+      <Link
+        href="/dashboard"
+        className="text-xl font-bold text-teal-600 hover:text-teal-700"
+      >
+        Biohack
+      </Link>
+
+      {/* Right side: user info / auth buttons */}
+      <div className="flex items-center space-x-4">
+        {user ? (
+          <>
+            <span className="font-medium text-gray-700">
+              Welcome back, {name || "User"}
+            </span>
+            <button
+              onClick={signOut}
+              className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <a
+            href="/auth/login"
+            className="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600"
           >
-            Logout
-          </button>
-        </>
-      ) : (
-        <a
-          href="/auth/login"
-          className="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600"
-        >
-          Login
-        </a>
-      )}
-    </div>
+            Login
+          </a>
+        )}
+      </div>
+    </header>
   );
 }

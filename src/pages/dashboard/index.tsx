@@ -38,18 +38,17 @@ export default function Dashboard() {
   return (
     <Layout title="Dashboard">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
         <aside className="w-64 bg-gray-100 p-6">
           <h2 className="text-xl font-bold mb-6">Dashboard</h2>
           <ul className="space-y-4">
-            <li><a href="#" className="hover:text-teal-600">Profile</a></li>
-            <li><a href="#" className="hover:text-teal-600">Week 1</a></li>
-            <li><a href="#" className="hover:text-teal-600">Week 2</a></li>
+            <li><a href="/dashboard/profile" className="hover:text-teal-600">Profile</a></li>
+            <li><a href="/dashboard/wearable" className="hover:text-teal-600">Wearable</a></li>
+            <li><a href="/dashboard/progress" className="hover:text-teal-600">Progress</a></li>
             <li><a href="#" className="hover:text-teal-600">Reports</a></li>
+            <li><a href="#" className="hover:text-teal-600">Chat with us</a></li>
           </ul>
         </aside>
 
-        {/* Main content */}
         <main className="flex-1 p-6">
           {loading ? (
             <p>Loading your data...</p>

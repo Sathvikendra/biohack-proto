@@ -5,9 +5,11 @@ import DashboardHeader from "@/components/DashboardHeader";
 export default function Layout({
   title,
   children,
+  showHeader = true,
 }: {
   title: string;
   children: React.ReactNode;
+  showHeader?: boolean;
 }) {
   return (
     <>
@@ -19,10 +21,7 @@ export default function Layout({
         />
       </Head>
 
-      <header className="sticky top-0 z-50 flex justify-between items-center px-6 py-3 bg-white shadow-md">
-        <h1 className="text-xl font-bold">{title}</h1>
-        <DashboardHeader />
-      </header>
+      {showHeader && <DashboardHeader />}
 
       <main className="min-h-screen bg-gray-50 text-gray-800 p-6">
         {children}

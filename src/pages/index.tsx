@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
   return (
-    <Layout title="Biohack Prototype">
+    <Layout title="Biohack Prototype" showHeader={false}>
       <section className="flex flex-col items-center justify-center py-20 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">
           AI-Driven Biohacking for a Healthier You

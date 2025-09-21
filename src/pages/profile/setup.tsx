@@ -24,24 +24,9 @@ const steps = [
 export default function ProfileSetup() {
   const { user } = useAuth();
   const router = useRouter();
-  useEffect(() => {
-    if (!user) return;
 
-    const checkProfile = async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("user_id")
-        .eq("user_id", user.id)
-        .single();
+  const editMode = router.query.edit === "true"; // detect edit mode
 
-      if (data) {
-        // User already has a profile → redirect to dashboard
-        router.replace("/dashboard");
-      }
-    };
-
-    checkProfile();
-  }, [user, router]);
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
@@ -74,6 +59,38 @@ export default function ProfileSetup() {
     goal_skin_beauty: false,
   });
 
+  // Fetch profile if edit mode
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchProfile = async () => {
+      if (editMode) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
+
+        if (!error && data) {
+          setForm(data);
+          if (data.weekend_wakeup === data.weekday_wakeup && data.weekend_bedtime === data.weekday_bedtime) {
+            setSameWeekend(true);
+          }
+        }
+      } else {
+        // Check if profile exists to redirect
+        const { data } = await supabase
+          .from("profiles")
+          .select("user_id")
+          .eq("user_id", user.id)
+          .single();
+        if (data) router.replace("/dashboard");
+      }
+    };
+
+    fetchProfile();
+  }, [user, editMode, router]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const t = e.target;
     const { name, value } = t;
@@ -102,11 +119,12 @@ export default function ProfileSetup() {
     setMsg("");
 
     let labPath = form.recent_lab_file;
-    if(!labFile) return;
+
     if (labFile) {
       const { data, error: uploadErr } = await supabase.storage
         .from('lab-tests')
-        .upload(`${user.id}/${labFile.name}`, labFile, { upsert: true ,contentType: 'application/pdf'});
+        .upload(`${user.id}/${labFile.name}`, labFile, { upsert: true, contentType: 'application/pdf' });
+
       if (uploadErr) {
         setMsg(uploadErr.message);
         setLoading(false);
@@ -123,8 +141,6 @@ export default function ProfileSetup() {
       weight_kg: Number(form.weight_kg) || null,
       work_hours_per_week: Number(form.work_hours_per_week) || null,
       avg_steps_per_day: Number(form.avg_steps_per_day) || null,
-      daily_meals: form.daily_meals,
-      fruit_veg_servings: form.fruit_veg_servings,
       daily_water_intake_l: Number(form.daily_water_intake_l) || null,
       screen_time_hours: Number(form.screen_time_hours) || null,
       sleep_duration_hours: Number(form.sleep_duration_hours) || null,
@@ -132,7 +148,13 @@ export default function ProfileSetup() {
 
     setLoading(false);
     if (error) setMsg(error.message);
-    else router.push("/dashboard/index");
+    else {
+      if (editMode) {
+        router.push("/dashboard/profile");
+      } else {
+        router.push("/dashboard");
+      }
+    }
   };
 
   const renderStep = () => {
@@ -322,7 +344,7 @@ export default function ProfileSetup() {
   };
 
   return (
-    <Layout title="Profile Setup">
+    <Layout title={editMode ? "Edit Profile" : "Profile Setup"} showHeader={false}>
       <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow">
         <ProgressBar step={step + 1} total={steps.length} />
         <h2 className="text-xl font-bold mb-4">{steps[step]}</h2>
@@ -339,7 +361,7 @@ export default function ProfileSetup() {
               disabled={loading}
               className="ml-auto px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 disabled:opacity-50"
             >
-              {step === steps.length - 1 ? (loading ? "Saving…" : "Finish") : "Next"}
+              {step === steps.length - 1 ? (loading ? "Saving…" : editMode ? "Update" : "Finish") : "Next"}
             </button>
           </div>
         </form>
