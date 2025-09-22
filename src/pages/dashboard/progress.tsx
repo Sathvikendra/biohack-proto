@@ -355,7 +355,6 @@ export default function WeeklyInsightsTabs() {
           </button>
         </div>
 
-        {/* Main content */}
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-bold mb-4">{selectedSection}</h1>
 
@@ -372,13 +371,13 @@ export default function WeeklyInsightsTabs() {
           ) : (
             <Bar data={charts[selectedSection as keyof typeof charts]} />
           )}
+
         </div>
       </div>
     </Layout>
   );
 }
 
-// Mock AI insights generator
 function generateMockAIInsights(wearableData: WearableData[]): AIInsights {
   const avgSleep =
     wearableData.reduce((acc, d) => acc + d.sleep_hours, 0) / wearableData.length;

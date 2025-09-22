@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { summarizeLifestyle } from "@/utils/sleep";
 import { estimateStress } from "@/utils/stress";
+import { summarizeGoals } from "@/utils/goals";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -52,7 +53,12 @@ export default function Wearable() {
       stress_level: "",
       calories_consumed: Math.floor(Math.random() * 1000) + 1500,
       water_intake_l: parseFloat((Math.random() * 1.5 + 1).toFixed(1)),
+      goal_weight_management: true,
+      goal_energy_performance: true,
+      goal_longevity: true,
+      goal_skin_beauty: true,
       user_id: user.id,
+
     };
     mock.stress_level=estimateStress(mock.hrv);
 
@@ -66,7 +72,7 @@ export default function Wearable() {
       const res = await fetch("/api/generate_insight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile, wearable: mock, summary: summarizeLifestyle(mock) }),
+        body: JSON.stringify({ profile, wearable: mock, summary: summarizeLifestyle(mock), goals: summarizeGoals(mock) }),
       });
 
       const json = await res.json();

@@ -1,9 +1,3 @@
-export function detectSleepIrregularities(total: number, goal: number) {
-  if (total < goal - 1) return "Below goal sleep duration";
-  if (total > goal + 1) return "Above normal sleep duration";
-  return "Within normal range";
-}
-
 export function summarizeGoals(form: {
   goal_weight_management?: boolean;
   goal_energy_performance?: boolean;
@@ -18,13 +12,4 @@ export function summarizeGoals(form: {
   if (form.goal_skin_beauty) goals.push("Skin & beauty");
 
   return goals;
-}
-
-
-export function summarizeLifestyle(d: any) {
-  return `Slept ${d.sleep_duration} hrs:
-  Light ${d.sleep_light} hrs,
-  Deep ${d.sleep_deep} hrs,
-  REM ${d.sleep_rem} hrs.
-  Calories consumed: ${d.calories_consumed} kcal, Water intake: ${d.water_intake_l} L.`;
 }

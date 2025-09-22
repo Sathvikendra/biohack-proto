@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router"; // <-- import router
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "../context/AuthContext";
 
@@ -7,6 +8,7 @@ export default function DashboardHeader() {
   const { user, signOut, loading } = useAuth();
   const [name, setName] = useState<string | null>(null);
   const [loadingName, setLoadingName] = useState(true);
+  const router = useRouter(); // <-- initialize router
 
   useEffect(() => {
     if (!user) return;
@@ -30,6 +32,11 @@ export default function DashboardHeader() {
 
   if (loading || loadingName) return <p>Loading...</p>;
 
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/"); // <-- redirect to home page after logout
+  };
+
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-white shadow">
       <Link
@@ -47,7 +54,7 @@ export default function DashboardHeader() {
               Welcome back, {name || "User"}
             </span>
             <button
-              onClick={signOut}
+              onClick={handleLogout} // <-- use handler
               className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
             >
               Logout

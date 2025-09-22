@@ -13,7 +13,7 @@ export default function Home() {
         <p className="max-w-xl mb-8 text-gray-600">
           Personalized plans, virtual therapies, and nutraceutical guidance—powered by Generative AI.
         </p>
-        <Link href="/auth/signup" className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700">
+        <Link href="/auth/login" className="bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700">
           Get Started
         </Link>
       </section>

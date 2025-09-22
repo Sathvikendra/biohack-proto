@@ -3,6 +3,7 @@ import Layout from "@/components/Layout";
 import ProgressBar from "@/components/ProgressBar";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/context/AuthContext";
+import { summarizeGoals } from "@/utils/sleep";
 import Link from "next/link";
 
 const steps = [
