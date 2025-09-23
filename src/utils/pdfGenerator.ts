@@ -69,6 +69,7 @@
 
 
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import toast from 'react-hot-toast';
 
 export async function downloadPDF(data: any) {
   const pdfDoc = await PDFDocument.create();
@@ -151,4 +152,5 @@ export async function downloadPDF(data: any) {
   a.download = "biohack-plan.pdf";
   a.click();
   URL.revokeObjectURL(url);
+  toast.success('Your Biohack plan PDF is ready');
 }

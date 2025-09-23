@@ -221,7 +221,6 @@
 //   };
 // }
 
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Bar } from "react-chartjs-2";
@@ -235,6 +234,8 @@ import {
   Legend,
 } from "chart.js";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -259,7 +260,6 @@ export default function WeeklyInsightsTabs() {
   const [selectedSection, setSelectedSection] = useState<string>("Sleep");
 
   useEffect(() => {
-    // Mock data for 7 days
     const today = new Date();
     const mockData: WearableData[] = Array.from({ length: 7 }).map((_, i) => {
       const date = new Date(today);
@@ -273,12 +273,10 @@ export default function WeeklyInsightsTabs() {
       };
     });
     setWearableData(mockData);
-
-    const insights = generateMockAIInsights(mockData);
-    setAiInsights(insights);
+    toast.success("Progress updated for past 7 days");
+    setAiInsights(generateMockAIInsights(mockData));
   }, []);
 
-  // Chart data
   const charts = {
     Sleep: {
       labels: wearableData.map((d) => d.date),
@@ -286,7 +284,8 @@ export default function WeeklyInsightsTabs() {
         {
           label: "Sleep Duration (hrs)",
           data: wearableData.map((d) => d.sleep_hours),
-          backgroundColor: "rgba(75,192,192,0.5)",
+          backgroundColor: "#3b82f6", // Tailwind blue-500
+          borderRadius: 6,
         },
       ],
     },
@@ -296,7 +295,8 @@ export default function WeeklyInsightsTabs() {
         {
           label: "Steps",
           data: wearableData.map((d) => d.steps),
-          backgroundColor: "rgba(53,162,235,0.5)",
+          backgroundColor: "#10b981", // Tailwind green-500
+          borderRadius: 6,
         },
       ],
     },
@@ -306,7 +306,8 @@ export default function WeeklyInsightsTabs() {
         {
           label: "Stress Level",
           data: wearableData.map((d) => d.stress_level),
-          backgroundColor: "rgba(255,99,132,0.5)",
+          backgroundColor: "#ef4444", // Tailwind red-500
+          borderRadius: 6,
         },
       ],
     },
@@ -316,7 +317,8 @@ export default function WeeklyInsightsTabs() {
         {
           label: "Water Intake (L)",
           data: wearableData.map((d) => d.water_l),
-          backgroundColor: "rgba(54, 162, 235, 0.5)",
+          backgroundColor: "#f59e0b", // Tailwind yellow-500
+          borderRadius: 6,
         },
       ],
     },
@@ -324,60 +326,98 @@ export default function WeeklyInsightsTabs() {
 
   return (
     <Layout title="Weekly Insights">
+      <div className="max-w-6xl mx-auto mt-6">
         <Link
           href="/dashboard"
-          className="inline-block px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
+          className="inline-block px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
         >
           ← Back to Dashboard
         </Link>
-      <div className="flex max-w-6xl mx-auto mt-6 bg-white rounded-xl shadow">
-        {/* Sidebar */}
-        <div className="w-48 border-r">
-          <h2 className="text-xl font-bold p-4 border-b">Conditions</h2>
-          {Object.keys(charts).map((section) => (
+
+        <motion.div
+          className="flex mt-6 bg-white rounded-2xl shadow-lg overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          {/* Sidebar */}
+          <div className="w-48 border-r bg-gray-50">
+            <h2 className="text-xl font-bold p-4 border-b text-gray-800">Conditions</h2>
+            {Object.keys(charts).map((section) => (
+              <button
+                key={section}
+                onClick={() => setSelectedSection(section)}
+                className={`block w-full text-left px-4 py-3 transition hover:bg-gray-100 ${
+                  selectedSection === section
+                    ? "bg-teal-100 font-semibold border-l-4 border-teal-500"
+                    : "text-gray-700"
+                }`}
+              >
+                {section}
+              </button>
+            ))}
             <button
-              key={section}
-              onClick={() => setSelectedSection(section)}
-              className={`block w-full text-left px-4 py-3 hover:bg-gray-100 ${
-                selectedSection === section ? "bg-gray-200 font-semibold" : ""
+              onClick={() => setSelectedSection("AI Recommendations")}
+              className={`block w-full text-left px-4 py-3 transition hover:bg-gray-100 ${
+                selectedSection === "AI Recommendations"
+                  ? "bg-teal-100 font-semibold border-l-4 border-teal-500"
+                  : "text-gray-700"
               }`}
             >
-              {section}
+              AI Recommendations
             </button>
-          ))}
-          <button
-            onClick={() => setSelectedSection("AI Recommendations")}
-            className={`block w-full text-left px-4 py-3 hover:bg-gray-100 ${
-              selectedSection === "AI Recommendations" ? "bg-gray-200 font-semibold" : ""
-            }`}
-          >
-            AI Recommendations
-          </button>
-        </div>
+          </div>
 
-        <div className="flex-1 p-6">
-          <h1 className="text-2xl font-bold mb-4">{selectedSection}</h1>
+          {/* Main Content */}
+          <div className="flex-1 p-6">
+            <h1 className="text-2xl font-bold mb-4 text-teal-600">{selectedSection}</h1>
 
-          {selectedSection === "AI Recommendations" ? (
-            <ul className="list-disc pl-6 space-y-2">
-              {aiInsights
-                ? Object.entries(aiInsights).map(([key, value]) => (
-                    <li key={key}>
-                      <strong>{key.replace(/_/g, " ")}:</strong> {value}
-                    </li>
-                  ))
-                : "No AI insights available."}
-            </ul>
-          ) : (
-            <Bar data={charts[selectedSection as keyof typeof charts]} />
-          )}
-
-        </div>
+            {selectedSection === "AI Recommendations" ? (
+              <motion.ul
+                key="ai"
+                className="space-y-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {aiInsights
+                  ? Object.entries(aiInsights).map(([key, value]) => (
+                      <li
+                        key={key}
+                        className="bg-teal-50 p-4 rounded-lg shadow hover:shadow-md transition"
+                      >
+                        <strong className="capitalize">{key.replace(/_/g, " ")}:</strong> {value}
+                      </li>
+                    ))
+                  : "No AI insights available."}
+              </motion.ul>
+            ) : (
+              <motion.div
+                key={selectedSection}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Bar
+                  data={charts[selectedSection as keyof typeof charts]}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: { position: "top" },
+                      title: { display: true, text: selectedSection, font: { size: 18 } },
+                    },
+                  }}
+                />
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
       </div>
     </Layout>
   );
 }
 
+// Mock AI insights generator
 function generateMockAIInsights(wearableData: WearableData[]): AIInsights {
   const avgSleep =
     wearableData.reduce((acc, d) => acc + d.sleep_hours, 0) / wearableData.length;
@@ -391,8 +431,7 @@ function generateMockAIInsights(wearableData: WearableData[]): AIInsights {
   return {
     sleep_suggestion: avgSleep < 7 ? "Try to sleep at least 7 hrs/night" : "Great sleep consistency",
     activity_suggestion: avgSteps < 10000 ? "Increase steps to 10k/day" : "Good activity levels",
-    stress_suggestion:
-      avgStress > 5 ? "Consider meditation or stress relief exercises" : "Stress levels are normal",
+    stress_suggestion: avgStress > 5 ? "Consider meditation or stress relief exercises" : "Stress levels are normal",
     hydration_suggestion: avgWater < 2 ? "Drink at least 2L water/day" : "Hydration is adequate",
   };
 }

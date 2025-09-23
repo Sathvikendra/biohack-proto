@@ -1,12 +1,22 @@
 import React from "react";
 
-export default function ProgressBar({ step, total }: { step: number; total: number }) {
-  const percent = (step / total) * 100;
+interface ProgressBarProps {
+  step: number;
+  total: number;
+  className?: string; // optional className
+}
+
+export default function ProgressBar({ step, total, className = "" }: ProgressBarProps) {
+  const percent = Math.min((step / total) * 100, 100);
+
   return (
-    <div className="w-full bg-gray-200 h-2 rounded-full mb-6">
+    <div className={`w-full h-3 bg-gray-200 rounded-full overflow-hidden ${className}`}>
       <div
-        className="bg-teal-600 h-2 rounded-full transition-all duration-300"
-        style={{ width: `${percent}%` }}
+        className="h-3 rounded-full transition-all duration-500 shadow-inner"
+        style={{
+          width: `${percent}%`,
+          background: "linear-gradient(to right, #4fd1c5, #38b2ac)", // teal gradient
+        }}
       />
     </div>
   );

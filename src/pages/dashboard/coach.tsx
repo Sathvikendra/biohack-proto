@@ -275,53 +275,87 @@ export default function Dashboard() {
 
   return (
     <Layout title="AI Health Dashboard">
-      <div className="max-w-3xl mx-auto p-6 bg-gradient-to-b from-gray-50 to-white rounded-2xl shadow-lg space-y-6">
-        <Link
-          href="/dashboard"
-          className="inline-block px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm"
-        >
-          ← Back to Home
-        </Link>
+      <div className="max-w-3xl mx-auto p-6 bg-gradient-to-b from-gray-50 to-white rounded-3xl shadow-xl space-y-6">
+  <Link
+    href="/dashboard"
+    className="inline-block px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
+  >
+    ← Back to Home
+  </Link>
 
-        <h2 className="text-2xl font-bold text-gray-800 mt-2 flex items-center">
-          🧠 Ask Your AI Health Coach
-        </h2>
+  <h2 className="text-2xl font-bold text-gray-800 mt-2 flex items-center justify-center gap-2">
+    🧠 Ask Your AI Health Coach
+  </h2>
 
-        <div className="border rounded-2xl overflow-hidden flex flex-col h-[520px] shadow-inner">
-          {/* Chat Body */}
+  <div className="border rounded-3xl overflow-hidden flex flex-col h-[520px] shadow-inner bg-gradient-to-b from-gray-50 to-white">
+    {/* Chat Body */}
+    <div
+      ref={chatBodyRef}
+      className="flex-1 p-4 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-teal-300 scrollbar-track-gray-100"
+    >
+      {messages.map((msg, i) => {
+        const isUser = msg.sender === "user";
+
+        if (msg.text === "__typing__") {
+          return (
+            <div key={i} className="flex items-end gap-3 justify-start animate-pulse">
+              <img src={botIcon} alt="Bot" className="w-8 h-8 rounded-full" />
+              <div className="bg-gray-200 p-3 rounded-2xl w-16 flex justify-around">
+                <span className="animate-bounce">•</span>
+                <span className="animate-bounce delay-100">•</span>
+                <span className="animate-bounce delay-200">•</span>
+              </div>
+            </div>
+          );
+        }
+
+        return (
           <div
-            ref={chatBodyRef}
-            className="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-4"
+            key={i}
+            className={`flex items-end gap-3 ${isUser ? "justify-end" : "justify-start"}`}
           >
-            {messages.map(renderMessage)}
-          </div>
-
-          {/* Input Bar */}
-          <div className="flex items-center gap-3 p-3 border-t bg-white sticky bottom-0">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-              placeholder="Type your question..."
-              className="flex-1 rounded-full border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-              disabled={loading}
-            />
-            <button
-              onClick={sendMessage}
-              disabled={loading}
-              className="bg-teal-600 hover:bg-teal-700 text-white rounded-full px-5 py-2 font-medium transition disabled:opacity-50"
+            {!isUser && <img src={botIcon} alt="Bot" className="w-8 h-8 rounded-full" />}
+            <div
+              className={`p-3 max-w-md break-words shadow-md transition-transform hover:scale-[1.02] rounded-3xl backdrop-blur-sm ${
+                isUser
+                  ? "bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-br-sm"
+                  : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm"
+              }`}
             >
-              {loading ? "…" : <FontAwesomeIcon icon={faPaperPlane} />}
-            </button>
+              {isUser ? msg.text : <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>}
+            </div>
+            {isUser && <img src={userIcon} alt="User" className="w-8 h-8 rounded-full" />}
           </div>
-        </div>
+        );
+      })}
+    </div>
 
-        <p className="text-xs text-center text-gray-500 italic border-t pt-3">
-          Important: I am an AI assistant, not a medical doctor. For medical
-          emergencies, contact local emergency services.
-        </p>
-      </div>
+    {/* Input Bar */}
+    <div className="flex items-center gap-3 p-3 bg-white sticky bottom-0 rounded-t-3xl shadow-lg border-t">
+      <input
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+        placeholder="Type your question..."
+        className="flex-1 rounded-full border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-sm"
+        disabled={loading}
+      />
+      <button
+        onClick={sendMessage}
+        disabled={loading}
+        className="bg-teal-600 hover:bg-teal-700 text-white rounded-full px-5 py-3 font-medium transition disabled:opacity-50 shadow-lg"
+      >
+        {loading ? "…" : <FontAwesomeIcon icon={faPaperPlane} />}
+      </button>
+    </div>
+  </div>
+
+  <p className="text-xs text-center text-gray-500 italic border-t pt-3">
+    ⚠️ Important: I am an AI assistant, not a medical doctor. For medical emergencies, contact local emergency services.
+  </p>
+</div>
+
     </Layout>
   );
 }
