@@ -121,7 +121,9 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { downloadPDF } from "@/utils/pdfGenerator";
 import { therapies } from "@/utils/therapies";
-import { User } from "lucide-react"; // optional icon (install lucide-react)
+import { User } from "lucide-react";
+import BioScoreModal from "@/components/bioscoreModal";
+// import { calculateBioScore } from "@/utils/bioscore";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -154,6 +156,8 @@ export default function Dashboard() {
     ],
     selectedTherapies: therapies.slice(0, 5),
   };
+
+  // const bioScore = calculateBioScore(user);
 
   useEffect(() => {
     if (!user) return;
@@ -216,28 +220,40 @@ export default function Dashboard() {
           ) : (
             <>
               {/* Welcome Card */}
-              <section className="relative overflow-hidden rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 p-6 text-white shadow">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-3xl font-bold">
-                    {profile?.name?.charAt(0) || <User size={28} />}
+              <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-700 via-teal-600 to-teal-500 p-8 text-white shadow-xl">
+                {/* Decorative background blur */}
+                <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+                <div className="absolute -bottom-12 -left-12 h-48 w-48 rounded-full bg-teal-400/20 blur-3xl" />
+
+                {/* Content */}
+                <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                  {/* Avatar */}
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/25 text-4xl font-bold shadow-inner backdrop-blur-md border border-white/30">
+                    {profile?.name?.charAt(0) || <User size={32} />}
                   </div>
-                  <div>
-                    <h1 className="text-2xl font-semibold">
-                      {getGreeting()}, {profile?.name || "User"}!
+
+                  {/* Greeting + subtitle */}
+                  <div className="flex-1 text-center sm:text-left">
+                    <h1 className="text-3xl font-extrabold tracking-tight drop-shadow-sm">
+                      {getGreeting()}, {profile?.name || "Explorer"}!
                     </h1>
-                    <p className="text-teal-100">
+                    <p className="mt-1 text-teal-100 text-lg">
                       Here’s a snapshot of your biohacking journey.
                     </p>
+
+                    {/* Action buttons */}
+                    <div className="mt-5 flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
+                      <BioScoreModal profile={profile} />
+                      <button
+                        onClick={() => downloadPDF(mockPDFData)}
+                        className="px-5 py-2 rounded-lg font-medium bg-white text-teal-700 hover:bg-teal-50 shadow-md transition transform hover:scale-105 active:scale-95"
+                      >
+                        Download My Plan
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => downloadPDF(mockPDFData)}
-                  className="absolute top-6 right-6 bg-white text-teal-700 hover:bg-teal-50 px-4 py-2 rounded-lg font-medium shadow transition"
-                >
-                  Download My Plan
-                </button>
               </section>
-
               {/* Info + Goals Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <section className="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
