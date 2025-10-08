@@ -115,7 +115,7 @@
 //   );
 // }
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
@@ -123,12 +123,14 @@ import { downloadPDF } from "@/utils/pdfGenerator";
 import { therapies } from "@/utils/therapies";
 import { User } from "lucide-react";
 import BioScoreModal from "@/components/bioscoreModal";
-// import { calculateBioScore } from "@/utils/bioscore";
+import ChakraDashboard from "@/components/chakraDashboard";
+import { getChakraStatus, ChakraStatus } from "@/utils/chakraService";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [chakraStatus, setChakraStatus] = useState<ChakraStatus | null>(null);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -140,7 +142,7 @@ export default function Dashboard() {
   const mockPDFData = {
     profile: { age: 28, gender: "Male", goal: "Increase Fitness" },
     wearable: {
-      steps: 12000,
+      steps: 3000,
       calories_burned: 2500,
       sleep_duration: 7.5,
       resting_heart_rate: 60,
@@ -157,7 +159,31 @@ export default function Dashboard() {
     selectedTherapies: therapies.slice(0, 5),
   };
 
-  // const bioScore = calculateBioScore(user);
+  const chakras = useMemo(() => {
+    if (!chakraStatus) return [];
+    return [
+      { name: "Root", color: "#E53935", icon: "/icons/root.svg", unlocked: chakraStatus.root },
+      { name: "Sacral", color: "#FB8C00", icon: "/icons/sacral.svg", unlocked: chakraStatus.sacral },
+      { name: "Solar Plexus", color: "#FDD835", icon: "/icons/solar.svg", unlocked: chakraStatus.solar_plexus },
+      { name: "Heart", color: "#43A047", icon: "/icons/heart.svg", unlocked: chakraStatus.heart },
+      { name: "Throat", color: "#1E88E5", icon: "/icons/throat.svg", unlocked: chakraStatus.throat },
+      { name: "Third Eye", color: "#8E24AA", icon: "/icons/third_eye.svg", unlocked: chakraStatus.third_eye },
+      { name: "Crown", color: "#D81B60", icon: "/icons/crown.svg", unlocked: chakraStatus.crown },
+    ];
+  }, [chakraStatus]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchChakras = async () => {
+      setLoading(true);
+      const status = await getChakraStatus(user.id);
+      setChakraStatus(status);
+      setLoading(false);
+    };
+
+    fetchChakras();
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -279,6 +305,18 @@ export default function Dashboard() {
                     {profile?.goal_skin_beauty && <li>Skin & beauty</li>}
                   </ul>
                 </section>
+              </div>
+              <div className="mt-8">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Chakra Alignment</h2>
+                <ChakraDashboard
+                  // chakras={chakras}
+                  // dashboardData={{
+                  //   steps: mockPDFData.wearable.steps,
+                  //   calories_burned: mockPDFData.wearable.calories_burned,
+                  //   sleep_duration: mockPDFData.wearable.sleep_duration,
+                  //   water_intake: mockPDFData.wearable.water_intake,
+                  // }}
+                />
               </div>
             </>
           )}
