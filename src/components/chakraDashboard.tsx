@@ -267,11 +267,11 @@ const ChakraDashboard: React.FC = () => {
   const chakraPositions = [
     { key: "crown", top: "12%", left: "50%" },
     { key: "third_eye", top: "21%", left: "50%" },
-    { key: "throat", top: "30%", left: "50%" },
+    { key: "throat", top: "33%", left: "50%" },
     { key: "heart", top: "43%", left: "50%" },
-    { key: "solar_plexus", top: "56%", left: "50%" },
-    { key: "sacral", top: "70%", left: "50%" },
-    { key: "root", top: "85%", left: "50%" },
+    { key: "solar_plexus", top: "54%", left: "50%" },
+    { key: "sacral", top: "66%", left: "50%" },
+    { key: "root", top: "76%", left: "50%" },
   ];
 
   return (
